@@ -1,6 +1,7 @@
 import collections
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -109,6 +110,10 @@ def write_build_listing(items, outfile):
   fout.close()
 
 
+def copy_build_listing(orig_file, replace_suffix):
+  shutil.copy2(orig_file, orig_file.replace('.nes.0.nl'), replace_suffix)
+
+
 def process():
   args = sys.argv[1:]
   (link_objects, build_target, listing_file) = extract_args(args)
@@ -139,6 +144,7 @@ def process():
   build_base, build_ext = os.path.splitext(build_name)
   build_listing = os.path.join(build_dir, build_base + '.nes.0.nl')
   write_build_listing(items, build_listing)
+  copy_build_listing(build_listing, '.nes.ram.nl')
 
 
 if __name__ == '__main__':

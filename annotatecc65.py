@@ -6,6 +6,8 @@ import sys
 def run_cmd(cmd):
   p = subprocess.Popen(' '.join(cmd), shell=True)
   p.communicate()
+  if p.returncode != 0:
+    sys.exit(p.returncode)
 
 
 def read_file(name):
