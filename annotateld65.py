@@ -111,7 +111,7 @@ def write_build_listing(items, outfile):
 
 
 def copy_build_listing(orig_file, replace_suffix):
-  shutil.copy2(orig_file, orig_file.replace('.nes.0.nl'), replace_suffix)
+  shutil.copy2(orig_file, orig_file.replace('.nes.0.nl', replace_suffix))
 
 
 def process():
