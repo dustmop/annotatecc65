@@ -17,6 +17,7 @@ class Pair(object):
 
 
 def read_file(filename):
+  """Get the contents of the file."""
   fp = open(filename, 'r')
   content = fp.read()
   fp.close()
@@ -24,6 +25,7 @@ def read_file(filename):
 
 
 def parse_ln_file(filename):
+  """Read .ln file, convert it to a sorted list of address and labels."""
   content = read_file(filename)
   accum = []
   for line in content.split('\n'):
@@ -40,6 +42,7 @@ def parse_ln_file(filename):
 
 
 def parse_map_file(filename):
+  """Read .map file, convert it to a dict from meta-labels to source code."""
   content = read_file(filename)
   map = {}
   for line in content.split('\n'):
@@ -53,6 +56,7 @@ def parse_map_file(filename):
 
 
 def combine_ln_and_map(items, source_map):
+  """Merge .ln and .map files, making a list of addresses and source code."""
   combined = collections.defaultdict(Pair)
   for address, label in items:
     if label.startswith('_Rsource_map__'):
@@ -75,6 +79,7 @@ def link_file(args):
 
 
 def read_num_prg_banks(rom_file):
+  """Get the number of prg banks from the ROM header."""
   fp = open(rom_file, 'r')
   bytes = fp.read(5)
   fp.close()
@@ -82,6 +87,7 @@ def read_num_prg_banks(rom_file):
 
 
 def extract_args(args):
+  """Manipulate the command-line args to the linker."""
   link_objects = []
   build_target = None
   listing_file = None
@@ -105,6 +111,7 @@ def extract_args(args):
 
 
 def write_build_listing(items, outfile):
+  """Write contents of a single listing file."""
   fout = open(outfile, 'w')
   for address,label,comment in items:
     if label and label[0:6] == '__BSS_':
@@ -118,6 +125,7 @@ def write_build_listing(items, outfile):
 
 
 def copy_build_listing(orig_file, prg_banks):
+  """Copy the listing for each PRG bank."""
   for n in xrange(prg_banks):
     replace_suffix = '.nes.%d.nl' % n
     dest_file = orig_file.replace('.nes.ram.nl', replace_suffix)
@@ -125,6 +133,7 @@ def copy_build_listing(orig_file, prg_banks):
 
 
 def process():
+  # Process command line args.
   args = sys.argv[1:]
   (link_objects, build_target, listing_file) = extract_args(args)
   if '-Ln' not in args:
@@ -151,7 +160,7 @@ def process():
   ln_data = parse_ln_file(listing_file)
   items = combine_ln_and_map(ln_data, source_map)
 
-  # Create listing.
+  # Create listings.
   build_dir = os.path.dirname(build_target)
   build_name = os.path.basename(build_target)
   build_base, build_ext = os.path.splitext(build_name)

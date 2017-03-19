@@ -18,6 +18,7 @@ def read_file(name):
 
 
 def annotate_intermediary(source_basename, content, fout, fmap):
+  """Insert meta-labels into the compiled source while building map file."""
   is_code = n = 0
   for line in content.split('\n'):
     if not line:
