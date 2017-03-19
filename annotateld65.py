@@ -74,6 +74,13 @@ def link_file(args):
   run_cmd(['ld65'] + args)
 
 
+def read_num_prg_banks(rom_file):
+  fp = open(rom_file, 'r')
+  bytes = fp.read(5)
+  fp.close()
+  return ord(bytes[4])
+
+
 def extract_args(args):
   link_objects = []
   build_target = None
@@ -110,8 +117,11 @@ def write_build_listing(items, outfile):
   fout.close()
 
 
-def copy_build_listing(orig_file, replace_suffix):
-  shutil.copy2(orig_file, orig_file.replace('.nes.0.nl', replace_suffix))
+def copy_build_listing(orig_file, prg_banks):
+  for n in xrange(prg_banks):
+    replace_suffix = '.nes.%d.nl' % n
+    dest_file = orig_file.replace('.nes.ram.nl', replace_suffix)
+    shutil.copy2(orig_file, dest_file)
 
 
 def process():
@@ -123,6 +133,9 @@ def process():
 
   # Call the linker.
   link_file(args)
+
+  # Get number of prg banks.
+  prg_banks = read_num_prg_banks(build_target)
 
   # Parse source map for each object.
   source_map = {}
@@ -142,9 +155,9 @@ def process():
   build_dir = os.path.dirname(build_target)
   build_name = os.path.basename(build_target)
   build_base, build_ext = os.path.splitext(build_name)
-  build_listing = os.path.join(build_dir, build_base + '.nes.0.nl')
+  build_listing = os.path.join(build_dir, build_base + '.nes.ram.nl')
   write_build_listing(items, build_listing)
-  copy_build_listing(build_listing, '.nes.ram.nl')
+  copy_build_listing(build_listing, prg_banks)
 
 
 if __name__ == '__main__':
