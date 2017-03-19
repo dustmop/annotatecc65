@@ -23,17 +23,21 @@ def annotate_intermediary(source_basename, content, fout, fmap):
   for line in content.split('\n'):
     if not line:
       continue
+    # cc65 outputs source code as three commented lines.
     if line[0] == ';':
       is_code += 1
     else:
       is_code = 0
+    # cc65 disables debuginfo, turn it back on.
     if line == '\t.debuginfo\toff':
       fout.write('.debuginfo on\n')
       continue
     fout.write(line + '\n')
+    # The source code appears on the middle commented line.
     if is_code == 2:
       code_text = line[1:]
     elif is_code == 3:
+      # Don't output source code for raw assembly, because it's not needed.
       if '__asm__' in code_text:
         continue
       if n:
