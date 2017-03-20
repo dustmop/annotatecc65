@@ -9,7 +9,7 @@ def run_cmd(bin, cmd):
   out, err = p.communicate()
   if p.returncode == 0:
     return
-  if 'command not found' not in err:
+  if not ('command not found' in err or 'not recognized as an' in err):
     sys.stderr.write(err)
     sys.exit(p.returncode)
   # Check if the binary is in the same directory as this script.
@@ -22,7 +22,7 @@ def run_cmd(bin, cmd):
   out, err = p.communicate()
   if p.returncode == 0:
     return
-  if 'command not found' not in err:
+  if not ('command not found' in err or 'not recognized as an' in err):
     sys.stderr.write(orig_err)
   else:
     sys.stderr.write(err)
