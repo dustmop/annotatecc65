@@ -6,9 +6,25 @@ import subprocess
 import sys
 
 
-def run_cmd(cmd):
-  p = subprocess.Popen(' '.join(cmd), shell=True)
-  p.communicate()
+def run_cmd(bin, cmd):
+  p = subprocess.Popen(' '.join([bin] + cmd), shell=True,
+                       stderr=subprocess.PIPE)
+  _, err = p.communicate()
+  if p.returncode != 0:
+    if 'command not found' not in err:
+      sys.stderr.write(err)
+      sys.exit(p.returncode)
+  # Check if the binary is in the same directory as this script.
+  orig_err = err
+  dir = os.path.dirname(__file__)
+  bin = os.path.join(dir, bin)
+  # Run command again.
+  p = subprocess.Popen(' '.join([bin] + cmd), shell=True,
+                       stderr=subprocess.PIPE)
+  _, err = p.communicate()
+  if p.returncode != 0:
+    sys.stderr.write(orig_err)
+    sys.exit(p.returncode)
 
 
 class Pair(object):
@@ -75,7 +91,7 @@ def combine_ln_and_map(items, source_map):
 
 
 def link_file(args):
-  run_cmd(['ld65'] + args)
+  run_cmd('ld65', args)
 
 
 def read_num_prg_banks(rom_file):
