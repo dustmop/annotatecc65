@@ -14,7 +14,7 @@ There are two choices:
 
 Then, in your build, change calls from cc65.exe to annotatecc65.py, and ld65.exe to annotateld65.py. Next, invoke your build normally.
 
-Annotatecc65.py will create .annotate.*.map and .annotate.*.s files in the same directory as the compiled object files. These are safe to delete once the build is complete.
+Annotatecc65.py will create .annotate.\*.map and .annotate.\*.s files in the same directory as the compiled object files. These are safe to delete once the build is complete.
 
 # Projects
 
