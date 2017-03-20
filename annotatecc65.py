@@ -6,11 +6,12 @@ import sys
 def run_cmd(bin, cmd):
   p = subprocess.Popen(' '.join([bin] + cmd), shell=True,
                        stderr=subprocess.PIPE)
-  _, err = p.communicate()
-  if p.returncode != 0:
-    if 'command not found' not in err:
-      sys.stderr.write(err)
-      sys.exit(p.returncode)
+  out, err = p.communicate()
+  if p.returncode == 0:
+    return
+  if 'command not found' not in err:
+    sys.stderr.write(err)
+    sys.exit(p.returncode)
   # Check if the binary is in the same directory as this script.
   orig_err = err
   dir = os.path.dirname(__file__)
@@ -18,10 +19,14 @@ def run_cmd(bin, cmd):
   # Run command again.
   p = subprocess.Popen(' '.join([bin] + cmd), shell=True,
                        stderr=subprocess.PIPE)
-  _, err = p.communicate()
-  if p.returncode != 0:
+  out, err = p.communicate()
+  if p.returncode == 0:
+    return
+  if 'command not found' not in err:
     sys.stderr.write(orig_err)
-    sys.exit(p.returncode)
+  else:
+    sys.stderr.write(err)
+  sys.exit(p.returncode)
 
 
 def read_file(name):
@@ -45,6 +50,9 @@ def annotate_intermediary(source_basename, content, fout, fmap):
     # cc65 disables debuginfo, turn it back on.
     if line == '\t.debuginfo\toff':
       fout.write('.debuginfo on\n')
+      continue
+    if line == '\t.debuginfo\t-':
+      fout.write('.debuginfo +\n')
       continue
     fout.write(line + '\n')
     # The source code appears on the middle commented line.
