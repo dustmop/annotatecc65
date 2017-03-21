@@ -26,9 +26,9 @@ def run_cmd(bin, cmd):
   if p.returncode == 0:
     return
   if not ('command not found' in err or 'not recognized as an' in err):
-    sys.stderr.write(orig_err)
-  else:
     sys.stderr.write(err)
+  else:
+    sys.stderr.write(orig_err)
   sys.exit(p.returncode)
 
 
