@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import sys
 
@@ -48,10 +49,10 @@ def annotate_intermediary(source_basename, content, fout, fmap):
     else:
       is_code = 0
     # cc65 disables debuginfo, turn it back on.
-    if line == '\t.debuginfo\toff':
+    if re.match(r'\W*.debuginfo.*off', line):
       fout.write('.debuginfo on\n')
       continue
-    if line == '\t.debuginfo\t-':
+    if re.match(r'\W*.debuginfo.*-', line):
       fout.write('.debuginfo +\n')
       continue
     fout.write(line + '\n')
