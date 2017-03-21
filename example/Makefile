@@ -15,7 +15,7 @@ S_OBJ = $(patsubst %.s,.b/%.o,$(S_SRC))
 
 .b/%.o: %.c
 	mkdir -p .b/
-	annotatecc65 -Oi $< -o $(patsubst %.o,%.s,$@)
+	python ../annotatecc65.py -Oi $< -o $(patsubst %.o,%.s,$@)
 	ca65 -o $@ $(patsubst %.o,%.s,$@)
 
 .b/%.o: %.s
@@ -23,5 +23,5 @@ S_OBJ = $(patsubst %.s,.b/%.o,$(S_SRC))
 	ca65 $< -o $@
 
 example.nes: $(C_OBJ) $(S_OBJ)
-	annotateld65 -o example.nes -C nrom.cfg \
+	python ../annotateld65.py -o example.nes -C nrom.cfg \
     $(C_OBJ) $(S_OBJ) runtime.lib
