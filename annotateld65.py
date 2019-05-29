@@ -101,7 +101,10 @@ def link_file(args):
 
 def read_num_prg_banks(rom_file):
   """Get the number of prg banks from the ROM header."""
-  fp = open(rom_file, 'r')
+  try:
+    fp = open(rom_file, 'r')
+  except IOError:
+    return None
   bytes = fp.read(5)
   fp.close()
   if len(bytes) < 5:
@@ -115,6 +118,7 @@ def extract_args(args):
   build_target = None
   listing_file = None
   i = 0
+  # TODO: Switch to argparse
   while i < len(args):
     if args[i] == '-o':
       build_target = args[i + 1]
@@ -158,6 +162,13 @@ def copy_build_listing(orig_file, prg_banks):
 def process():
   # Process command line args.
   args = sys.argv[1:]
+  num_prg = None
+  try:
+    pos = args.index('--num-prg')
+    num_prg = int(args[pos+1])
+    args = args[:pos] + args[pos+2:]
+  except:
+    pass
   (link_objects, build_target, listing_file) = extract_args(args)
   if '-Ln' not in args:
     args.append('-Ln')
@@ -168,6 +179,12 @@ def process():
 
   # Get number of prg banks.
   prg_banks = read_num_prg_banks(build_target)
+  if num_prg is not None:
+    prg_banks = num_prg
+  if prg_banks is None:
+    sys.stderr.write('ERROR: Cannot read number prg from ROM, '
+                     'use --num-prg flag\n')
+    sys.exit(1)
 
   # Parse source map for each object.
   source_map = {}

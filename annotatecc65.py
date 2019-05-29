@@ -94,6 +94,7 @@ def process():
   (output_file, args) = manipulate_args(args)
   if '--add-source' not in args:
     args.append('--add-source')
+  # TODO: if output_file == None, then output error, need -o in arguments
   final_dir = os.path.dirname(output_file)
   final_name = os.path.basename(output_file)
   final_base, final_ext = os.path.splitext(final_name)
